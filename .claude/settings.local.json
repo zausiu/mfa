@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -B5 -A5 \"corpus management\\\\|alignment results\\\\|multiprocess\\\\|parallel\" /home/kamus/500g/miniconda3/envs/mfa/lib/python3.12/site-packages/montreal_forced_aligner/*.py)"
+    ]
+  }
+}
