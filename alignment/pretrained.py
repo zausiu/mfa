@@ -107,6 +107,7 @@ class PretrainedAligner(TranscriberMixin, TopLevelMfaWorker):
 
     def setup_acoustic_model(self) -> None:
         """Set up the acoustic model"""
+        # QUESTION purpose of phones.txt and graphemes.txt
         # commented by claude: Extract the .zip acoustic model into the working directory.
         # This writes final.mdl, tree, phones.txt, graphemes.txt, and (if the model
         # supports speaker adaptation) final.alimdl. These files are the inputs
@@ -283,6 +284,7 @@ class PretrainedAligner(TranscriberMixin, TopLevelMfaWorker):
             # commented by claude: Build the KalpyAligner, a Python-level wrapper around
             # Kaldi's GmmAligner. It holds the loaded acoustic model and lexicon compilers
             # (one per pronunciation dictionary). Used later in align_one_utterance() for
+            # QUESTION: so there are more than one pronunciation dictionary ?
             # online (single-utterance) alignment, not for the main batch pipeline.
             self.kalpy_aligner = KalpyAligner(
                 self.acoustic_model,
@@ -465,6 +467,7 @@ class PretrainedAligner(TranscriberMixin, TopLevelMfaWorker):
         # commented by claude: Optional post-alignment refinement. FineTuneFunction
         # slides phone boundaries within a small tolerance window (sub-frame precision)
         # by re-scoring the acoustic model locally around each boundary.
+        # QUESTION: details of finue_tune. sub-frame ??
         if self.fine_tune:
             self.fine_tune_alignments()
 

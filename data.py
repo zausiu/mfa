@@ -404,7 +404,7 @@ class WorkflowType(enum.Enum):
     phone_transcription = 3
     per_speaker_transcription = 4
     speaker_diarization = 5
-    online_alignment = 6
+    online_alignment = 6  # difference with alignment QUESTION
     acoustic_training = 7
     acoustic_model_adaptation = 8
     segmentation = 9

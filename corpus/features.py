@@ -20,7 +20,7 @@ from kalpy.feat.fmllr import FmllrComputer
 from kalpy.feat.mfcc import MfccComputer
 from kalpy.feat.pitch import PitchComputer
 from kalpy.feat.vad import VadComputer
-from kalpy.gmm.data import AlignmentArchive
+from kalpy.gmm.data import AlignmentArchive  # QUESTION AlignmentArchive
 from kalpy.ivector.extractor import IvectorExtractor
 from kalpy.utils import generate_write_specifier
 from sqlalchemy.orm import joinedload

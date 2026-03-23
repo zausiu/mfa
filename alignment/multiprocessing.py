@@ -105,6 +105,7 @@ __all__ = [
 logger = logging.getLogger("mfa")
 
 
+# QUESTION explain this decoration.
 @dataclass
 class GeneratePronunciationsArguments(MfaArguments):
     """
@@ -387,7 +388,7 @@ class CompileTrainGraphsFunction(KaldiFunction):
 
     def __init__(self, args: CompileTrainGraphsArguments):
         super().__init__(args)
-        self.tree_path = args.tree_path
+        self.tree_path = args.tree_path # QUESTION: what's in tree file.
         self.lexicon_compilers = args.lexicon_compilers
         self.model_path = args.model_path
         self.use_g2p = args.use_g2p
@@ -405,6 +406,7 @@ class CompileTrainGraphsFunction(KaldiFunction):
             graph_logger.debug(f"Model path: {self.model_path}")
             # commented by claude: Load the Job record from the DB along with its associated
             # corpus and dictionaries (eagerly loaded to avoid N+1 queries in the loop below).
+            # QUESTION: how do you know it's eagerly loaded ?
             job = (
                 session.query(Job)
                 .options(joinedload(Job.corpus, innerjoin=True), subqueryload(Job.dictionaries))
@@ -490,6 +492,7 @@ class CompileTrainGraphsFunction(KaldiFunction):
                 # this composes the text through G (grammar/word sequence) → L (lexicon)
                 # → C (context) → H (HMM) FSTs, determinizes and minimizes the result,
                 # and writes the per-utterance HCLG to the ARK file.
+                # QUESTION: why not reuse the HCLG
                 compiler.export_graphs(
                     fst_ark_path,
                     query,
@@ -546,7 +549,7 @@ class AccStatsFunction(KaldiFunction):
                 if self.filter_likely_errors:
                     ignored_keys = set(
                         x[0]
-                        for x in session.query(Utterance.kaldi_id)
+                        for x in session.query(Utterance.kaldi_id) # QUESTION what is k
                         .filter(Utterance.job_id == self.job_name)  # noqa
                         .filter(
                             sqlalchemy.or_(
@@ -646,6 +649,7 @@ class AlignFunction(KaldiFunction):
                 )
             ]
 
+            # QUESTION: difference between final.mdl and final.alimdl
             # commented by claude: GmmAligner is a Python binding to Kaldi's GMM-based
             # forced aligner. It reads the acoustic model (final.mdl or final.alimdl)
             # and runs the Viterbi algorithm on the HCLG graph with the acoustic features.
@@ -679,6 +683,7 @@ class AlignFunction(KaldiFunction):
 
                 training_graph_archive = FstArchive(fst_path)
 
+                # QUESTION: HMM state ID
                 # commented by claude: ali.ark stores the Viterbi-decoded state sequence for
                 # each utterance — a sequence of HMM state IDs, one per feature frame.
                 # words.ark stores the word-level sequence. likelihoods.ark stores per-frame
@@ -722,8 +727,9 @@ class AlignFunction(KaldiFunction):
                 try:
                     # commented by claude: THE CORE ALIGNMENT CALL. Runs Kaldi's Viterbi
                     # forced alignment for every utterance in this job. For each utterance:
-                    # 1. Reads HCLG graph from training_graph_archive
+                    # 1. Reads HCLG graph from training_graph_archive # QUESTION: is hclg reused ?
                     # 2. Reads acoustic features from feature_archive
+                    # QUESTION: beam ?
                     # 3. Runs beam-search Viterbi decoding (beam=10, retry with beam=40 on failure)
                     # 4. Writes the decoded state sequence to ali_path
                     # 5. Calls self.callback((kaldi_id, log_likelihood)) per utterance
@@ -935,6 +941,7 @@ class AnalyzeAlignmentsFunction(KaldiFunction):
                     # the main process. The caller (analyze_alignments) collects these and
                     # bulk-writes them to the utterance table as speech_log_likelihood,
                     # duration_deviation, and snr columns.
+                    # QUESTION: how do you know which part is the signal which part is noise
                     self.callback(
                         (
                             utterance.id,
@@ -1116,6 +1123,7 @@ class FineTuneFunction(KaldiFunction):
                     self.callback(interval_mapping)
 
 
+# QUESTION explain
 class PhoneConfidenceFunction(KaldiFunction):
     """
     Multiprocessing function to calculate phone confidence metrics
@@ -1507,6 +1515,7 @@ class AlignmentExtractionFunction(KaldiFunction):
                     )
                     found_utterances = set()
                     for alignment in alignment_archive:
+                        # QUESTION: CTM?
                         # commented by claude: Convert the raw HMM state sequence into CTM
                         # phone intervals. generate_ctm uses the transition model to map
                         # state IDs → phone IDs → phone labels, then groups consecutive
