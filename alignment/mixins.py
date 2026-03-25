@@ -249,7 +249,6 @@ class AlignMixin(DictionaryMixin):
 
     def get_phone_confidences(self):
         if not os.path.exists(self.phone_pdf_counts_path):
-            # QUESTION where does the log goes...
             logger.warning("Cannot calculate phone confidences with the current model.")
             return
         logger.info("Calculating phone confidences...")
@@ -297,7 +296,6 @@ class AlignMixin(DictionaryMixin):
         # log_likelihood is None if the aligner failed for that utterance (e.g. beam too
         # narrow or utterance text not in the lexicon).
 
-        # QUESTION: the shape and type of the two return values.
         for utterance, log_likelihood in run_kaldi_function(
             AlignFunction, self.align_arguments(), total_count=self.num_current_utterances
         ):
@@ -331,7 +329,6 @@ class AlignMixin(DictionaryMixin):
                 # commented by claude: If zero utterances aligned, raise a descriptive error.
                 # The most common causes are: beam too narrow (increase --beam), audio/text
                 # mismatch, or OOV words missing from the dictionary.
-                # QUESTION: what is the beam ?
                 raise NoAlignmentsError(self.num_current_utterances, self.beam, self.retry_beam)
             with self.session() as session:
                 # commented by claude: Write raw log-likelihoods to the utterance table.
@@ -352,8 +349,8 @@ class AlignMixin(DictionaryMixin):
                     synchronize_session="fetch",
                 )
                 workflow = (
-                    session.query(CorpusWorkflow)  # QUESTION: details of CorpusWorkflow
-                    .filter(CorpusWorkflow.current == True)  # noqa  # QUESTION noqa???
+                    session.query(CorpusWorkflow)
+                    .filter(CorpusWorkflow.current == True)  # noqa
                     .first()
                 )
                 # commented by claude: Store the average log-likelihood for this alignment

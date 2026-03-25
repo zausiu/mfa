@@ -154,7 +154,6 @@ def align_corpus_cli(context, **kwargs) -> None:
 
         # commented by claude: STEP 2 — Quality analysis pass.
         # For every aligned utterance, computes: speech log-likelihood, duration
-        # QUESTION: what is Z-score ?
         # deviation (Z-score vs expected phone durations), and SNR. Results are written
         # back to the `utterance` table and exported as alignment_analysis.csv.
         aligner.analyze_alignments()

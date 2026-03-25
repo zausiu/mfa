@@ -76,7 +76,7 @@ from montreal_forced_aligner.textgrid import (
 )
 from montreal_forced_aligner.utils import log_kaldi_errors, run_kaldi_function
 
-if typing.TYPE_CHECKING:   # QUESTION
+if typing.TYPE_CHECKING:
     from montreal_forced_aligner.abc import MetaDict
 
 __all__ = ["CorpusAligner"]
@@ -85,7 +85,6 @@ __all__ = ["CorpusAligner"]
 logger = logging.getLogger("mfa")
 
 
-# QUESTION Mixin is NOT used appropriatly, it's abused. Draw the diagram for all Mixin
 class CorpusAligner(AcousticCorpusPronunciationMixin, AlignMixin, FileExporterMixin):
     """
     Mixin class that aligns corpora with pronunciation dictionaries
@@ -100,7 +99,6 @@ class CorpusAligner(AcousticCorpusPronunciationMixin, AlignMixin, FileExporterMi
         For file exporting parameters
     """
 
-    # QUESTION max_active ???  lattice_beam ????
     def __init__(
         self, g2p_model_path: Path = None, max_active: int = 2500, lattice_beam: int = 6, **kwargs
     ):
@@ -135,7 +133,7 @@ class CorpusAligner(AcousticCorpusPronunciationMixin, AlignMixin, FileExporterMi
             "beam": self.beam,
             "max_active": self.max_active,
             "lattice_beam": self.lattice_beam,
-            "acoustic_scale": self.acoustic_scale,  # QUESTION acoustic scale
+            "acoustic_scale": self.acoustic_scale,
         }
 
     @property
@@ -163,7 +161,6 @@ class CorpusAligner(AcousticCorpusPronunciationMixin, AlignMixin, FileExporterMi
     def cleanup_alignments(self):
         with self.session() as session:
             if config.USE_POSTGRES:
-                # QUESTION what does the table trigger ?
                 # Triggers often include foreign key enforcement logic, so disabling them allows the bulk delete to 
                 # proceed without constraint checks. The triggers are re-enabled afterward to restore normal integrity
                 # enforcement.
@@ -294,7 +291,6 @@ class CorpusAligner(AcousticCorpusPronunciationMixin, AlignMixin, FileExporterMi
                 )
                 for row in utterances:
                     writer.writerow([*row])
-        # QUESTION draw a picture/diagram to illustrate the database design.
         logger.debug(f"Analyzed alignment quality in {time.time() - begin:.3f} seconds")
 
     def alignment_extraction_arguments(self) -> List[AlignmentExtractionArguments]:
@@ -317,7 +313,6 @@ class CorpusAligner(AcousticCorpusPronunciationMixin, AlignMixin, FileExporterMi
         ):
             from_transcription = True
 
-        # QUESTION is transition model equal to alignment model.
         transition_model = read_transition_model(str(self.alignment_model_path))
         lexicon_compilers = {}
         if getattr(self, "use_g2p", False):
@@ -409,7 +404,6 @@ class CorpusAligner(AcousticCorpusPronunciationMixin, AlignMixin, FileExporterMi
         # Speaker adaptation improves alignment quality by estimating a per-speaker
         # feature transform that compensates for voice differences. It requires a SAT
         # (Speaker Adaptive Training) acoustic model and is disabled in SINGLE_SPEAKER mode.
-        # QUESTION: is my hk_cantonese model a SAT model ?
         perform_speaker_adaptation = self.uses_speaker_adaptation and not config.SINGLE_SPEAKER
         if perform_speaker_adaptation:
             # commented by claude: Temporarily disable speaker adaptation for the first pass.
@@ -450,7 +444,6 @@ class CorpusAligner(AcousticCorpusPronunciationMixin, AlignMixin, FileExporterMi
                 self.final_alignment = True
             # commented by claude: Switch to using the SAT model (final.mdl) instead of
             # the SI model (final.alimdl) now that fMLLR transforms are available.
-            # QUESTION what is SI ?
             self.uses_speaker_adaptation = True
             assert self.alignment_model_path.suffix == ".mdl"
             logger.info("Performing second-pass alignment...")
@@ -477,7 +470,6 @@ class CorpusAligner(AcousticCorpusPronunciationMixin, AlignMixin, FileExporterMi
         begin = time.time()
         acoustic_model = getattr(self, "acoustic_model", None)
         if acoustic_model is not None:
-            # QUESTION: what does export_model do? why bother this ?
             acoustic_model.export_model(self.working_directory)
         try:
             self.uses_speaker_adaptation = False
@@ -518,7 +510,6 @@ class CorpusAligner(AcousticCorpusPronunciationMixin, AlignMixin, FileExporterMi
             raise
         logger.debug(f"Generated alignments in {time.time() - begin:.3f} seconds")
 
-    # QUESTION: details ! I don't understand copilot's output. what's the core theory behind this function.
     def compute_pronunciation_probabilities(self):
         """
         Multiprocessing function that computes pronunciation probabilities from alignments

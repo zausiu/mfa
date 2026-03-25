@@ -1,0 +1,6 @@
+{
+    "python.defaultInterpreterPath": "/home/kamus/miniconda3/envs/mfa/bin/python3",
+    "python.analysis.extraPaths": [
+        "/home/kamus/500g/projs"
+    ]
+}

@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep -B5 -A5 \"corpus management\\\\|alignment results\\\\|multiprocess\\\\|parallel\" /home/kamus/500g/miniconda3/envs/mfa/lib/python3.12/site-packages/montreal_forced_aligner/*.py)"
+      "Bash(grep -B5 -A5 \"corpus management\\\\|alignment results\\\\|multiprocess\\\\|parallel\" /home/kamus/500g/miniconda3/envs/mfa/lib/python3.12/site-packages/montreal_forced_aligner/*.py)",
+      "Bash(python3 -c \"import montreal_forced_aligner; print\\(montreal_forced_aligner.__file__\\)\")",
+      "Bash(pip show:*)",
+      "Bash(conda run:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)"
     ]
   }
 }
